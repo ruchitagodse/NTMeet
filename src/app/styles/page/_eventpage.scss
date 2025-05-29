@@ -12,7 +12,114 @@ body {
   overflow-x: hidden;
   margin: 0;
 }
+.mainContainer {
+  color: #fff;
+  background: url('/space.jpeg') no-repeat center center fixed;
+  width: 100%;
+  min-height: 100vh;
+  background-size: cover;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  row-gap: 20px;
+  justify-content: center;
+}
 
+
+
+.mainContainer .signin {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.mainContainer .signin ul {
+  padding: 0 0px;
+  width: 100%;
+}
+
+.mainContainer .signin ul li {
+  /* padding: 0 0px; */
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.mainContainer form {
+  width: 100%;
+}
+
+/* Input Styles */
+.mainContainer input {
+  background-color: #fff;
+  border: none;
+  outline: none;
+  padding: 12px 30px;
+  border-radius: 30px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 14px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  /* margin-bottom: 20px; */
+  /* margin-top: 30px; */
+  transition: box-shadow 0.3s ease;
+  width: 100%;
+}
+
+.mainContainer input:focus {
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+/* Button Styles */
+.login {
+  font-size: 14px;
+  border-radius: 30px;
+  border: none;
+  background-color: #fd6f05;
+  color: white;
+  padding: 12px 30px;
+  cursor: pointer;
+  font-family: "Mukta", serif;
+  font-weight: 300;
+  margin-top: 10px;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.login :hover {
+  background-color: #e55a00;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+.logoContainer {
+  position: relative;
+  width: 300px;
+}
+
+.logoContainer img {
+  width: 100%;
+  z-index: 1;
+  position: relative;
+}
+
+.logoContainer:before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  /* position: relative; */
+  /* background: rgb(255, 255, 255); */
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ffffff+0,ffffff+100&1+0,0+100;White+to+Transparent */
+  /* Permalink - use to edit and share this gradient: https://colorzilla.com/gradient-editor/#ffffff+0,ffffff+74&1+0,0+74 */
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 60%, rgba(255, 255, 255, 0) 100%);
+  /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+
+  z-index: 0;
+}
 .eventList {
   display: flex;
   flex-direction: column;
@@ -146,6 +253,15 @@ body {
   }
 }
 // meeting Details
+.signin p {
+  color: #a2cad9;
+  font-weight: 500;
+  font-size: 30px;
+  text-align: center;
+  margin-bottom: 15px;
+  font-family: "Forum", serif;
+
+}
 
 .meetingDetailsBox {
   width: 100%;
