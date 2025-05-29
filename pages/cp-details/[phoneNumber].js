@@ -3,10 +3,7 @@ import { useRouter } from "next/router";
 import { doc, getDoc, collection, getDocs } from "firebase/firestore";
 import { db } from "../../firebaseConfig"; // Adjust if needed
 import '../../src/app/styles/user.scss';
-import { FiHome } from "react-icons/fi";
-import { TbBulb } from "react-icons/tb";
-import { MdOutlineBusinessCenter } from "react-icons/md";
-import { BiSolidCoinStack } from "react-icons/bi";
+import HeaderNav from "../../component/HeaderNav";
 
 const CPDetails = () => {
   const router = useRouter();
@@ -136,24 +133,7 @@ const CPDetails = () => {
             </div>
           )}
 
-      <div className="sticky-buttons-container">
-         <div className="icon-wrapper" onClick={() => router.push("/")}>
-           <FiHome size={26} />
-           <span className="red-dot" />
-         </div>
-        
-         <div className="icon-wrapper">
-           < MdOutlineBusinessCenter size={26} onClick={() => router.push("/Monthlymeetdetails")}/>
-         </div>
-         <div className="icon-wrapper">
-           <TbBulb size={26} onClick={() => router.push("/suggestion")}/>
-         </div>
-         <div className="icon-wrapper">
-           <BiSolidCoinStack size={26} onClick={() => router.push(`/cp-details/${phoneNumber}`)}/>
-           
-           <span className="red-dot" />
-         </div>
-       </div>
+    <HeaderNav/>
         </section>
       </main>
     </>

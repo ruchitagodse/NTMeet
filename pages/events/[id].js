@@ -57,7 +57,7 @@ const fetchFeedback = async () => {
         createdBy: data.createdBy || "Unknown",
         date: data.date?.seconds
           ? new Date(data.date.seconds * 1000).toLocaleDateString()
-          : "N/A",
+          : "Yet To Be Assigned",
       };
     });
 
@@ -702,44 +702,28 @@ const submitAddFeedback = async () => {
 
           {/* Feedback Form UI */}
           {showpopup && (
-            <section className="PopupMain">
-              <div className="popupBox">
-
-                {/* <button className="close-modal" onClick={closeAddFeedbackModal}><IoMdClose /></button> */}
-                <h2>Suggestions / Feedback</h2>
-                <div className="leave-container">
-                  {/* <div className="form-group">
-                  <select
-                    onChange={(e) => setPredefinedFeedback(e.target.value)}
-                    value={predefinedFeedback}
-                  >
-                    <option value="">Select Feedback</option>
-                    {predefinedFeedbacks.map((feedback, idx) => (
-                      <option key={idx} value={feedback}>{feedback}</option>
-                    ))}
-                  </select>
-                </div> */}
-                </div>
-                <div className="form-group">
-               <input
-  type="text"
-  value={suggestionText}
-  onChange={(e) => setSuggestionText(e.target.value)}
-/>
-
-                </div>
-                <div className="twobtn">
-                  <button className='submitBtn' onClick={submitAddFeedback} >
-                    Submit
-                  </button>
-                  {/* <button className='' onClick={closeAddFeedbackModal} >
-                  Cancel
-                </button> */}
-                </div>
-
-                <button className="closeBtn" onClick={() => setshowpopup(false)}><IoMdClose /></button>
-              </div>
-            </section>)
+          <div className="modal-overlay">
+    <div className="modal-content">
+      <h3>Add Suggestion</h3>
+      <textarea
+        rows={4}
+        value={suggestionText}
+        placeholder="Write your comment..."
+      onChange={(e) => setSuggestionText(e.target.value)}
+      />
+       <ul className='actionBtns'>
+                    <li>
+                      <button onClick={submitAddFeedback} className='m-button'>Submit</button>
+                    </li>
+                    <li>
+                      <button onClick={() => setshowpopup(false)} className='m-button-2'>Cancel</button>
+                    </li>
+                  </ul>
+    
+    </div>
+  </div>
+            
+            )
           }
         </section>
       </main>

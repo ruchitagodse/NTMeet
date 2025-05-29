@@ -430,7 +430,7 @@ const HomePage = () => {
             <Link href="/SuggestionList">
               <div className="summary-card on-hold" style={{ cursor: 'pointer' }}>
                 <p className="count">{suggestionCount}</p>
-                <p className="label">Total Suggestions</p>
+                <p className="label">Suggestions</p>
               </div>
             </Link>
             <Link href="/SuggestionList">
