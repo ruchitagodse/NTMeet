@@ -186,10 +186,76 @@ body {
   font-size: 14px;
   letter-spacing: 1px;
 }
+.profile-dropdown-wrapper {
+  position: relative;
+  .initials {
+    background-color: #4a90e2;
+    color: white;
+    border-radius: 50%;
+    padding: 10px 14px;
+    font-weight: bold;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .dropdown-card {
+    position: absolute;
+    right: 0;
+    top: 120%;
+    width: 300px;
+    background-color: white;
+    border-radius: 16px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.15);
+    padding: 20px;
+    z-index: 10;
+
+    .profile-section {
+      text-align: center;
+      img {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 10px;
+      }
+
+      .hi {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .email {
+        color: gray;
+        font-size: 0.85rem;
+      }
+    }
+
+    .button-group {
+      display: flex;
+      justify-content: center;
+      margin-top: 16px;
+
+      .logout-btn {
+        background-color: #e53935;
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+
+        &:hover {
+          background-color: #c62828;
+        }
+      }
+    }
+  }
+}
 
 .meetingBoxFooter {
   display: flex;
   width: 100%;
+  gap: 10px;
   justify-content: space-between;
   align-items: center;
 
@@ -355,7 +421,7 @@ body {
   border-radius: 30px;
   font-weight: 400;
   color: #FFF;
-  width: 45%;
+  width: 55%;
   column-gap: 5px;
   font-size: 14px;
   font-weight: 500;
@@ -993,9 +1059,7 @@ body {
 }
 
 .comments-section {
-  position: absolute;
-  bottom: 52px;
-  right: 20px;
+
   font-size: 18px;
 }
 
