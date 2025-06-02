@@ -8,7 +8,7 @@ import { doc, getDoc, collection, getDocs, setDoc } from 'firebase/firestore';
 import axios from 'axios';
 import HeaderNav from '../component/HeaderNav';
 import UserHeader from '../component/userHeader';
-
+import Swal from 'sweetalert2';
 
 const HomePage = () => {
   const router = useRouter();
@@ -112,7 +112,21 @@ const HomePage = () => {
 
     fetchDashboardCounts();
   }, [phoneNumber]);
-
+const handleLogout = () => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will be logged out.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Logout',
+    cancelButtonText: 'Cancel',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('ntnumber');
+      window.location.reload(); // or navigate to login
+    }
+  });
+};
 
   useEffect(() => {
     const storedPhoneNumber = localStorage.getItem("ntnumber");
@@ -322,83 +336,11 @@ const HomePage = () => {
             </div>
 
             <div className='headerRight'>
-              {/* <button onClick={() => router.push(`/cp-details/${phoneNumber}`)} class="reward-btn">
-                <div class="IconContainer">
-                  <svg
-                    class="box-top box"
-                    viewBox="0 0 60 20"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M2 18L58 18"
-                      stroke="#6A8EF6"
-                      stroke-width="4"
-                      stroke-linecap="round"
-                    ></path>
-                    <circle
-                      cx="20.5"
-                      cy="9.5"
-                      r="7"
-                      fill="#101218"
-                      stroke="#6A8EF6"
-                      stroke-width="5"
-                    ></circle>
-                    <circle
-                      cx="38.5"
-                      cy="9.5"
-                      r="7"
-                      fill="#101218"
-                      stroke="#6A8EF6"
-                      stroke-width="5"
-                    ></circle>
-                  </svg>
+            
+       <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+  <span>{getInitials(userName)}</span>
+</div>
 
-                  <svg
-                    class="box-body box"
-                    viewBox="0 0 58 44"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <mask id="path-1-inside-1_81_19" fill="white">
-                      <rect width="58" height="44" rx="3"></rect>
-                    </mask>
-                    <rect
-                      width="58"
-                      height="44"
-                      rx="3"
-                      fill="#101218"
-                      stroke="#6A8EF6"
-                      stroke-width="8"
-                      mask="url(#path-1-inside-1_81_19)"
-                    ></rect>
-                    <line
-                      x1="-3.61529e-09"
-                      y1="29"
-                      x2="58"
-                      y2="29"
-                      stroke="#6A8EF6"
-                      stroke-width="6"
-                    ></line>
-                    <path
-                      d="M45.0005 20L36 3"
-                      stroke="#6A8EF6"
-                      stroke-width="5"
-                      stroke-linecap="round"
-                    ></path>
-                    <path
-                      d="M21 3L13.0002 19.9992"
-                      stroke="#6A8EF6"
-                      stroke-width="5"
-                      stroke-linecap="round"
-                    ></path>
-                  </svg>
-
-                  <div class="coin"></div>
-                </div>
-                <div class="text">CP: {cpPoints}</div>  
-              </button> */}
-              <div className='userName'> <span>{getInitials(userName)}</span> </div>
             </div>
 
 

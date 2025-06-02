@@ -5,6 +5,7 @@ import { db } from '../firebaseConfig';
 import Link from 'next/link'
 import { doc, getDoc, collection, getDocs, setDoc } from 'firebase/firestore';
 import axios from 'axios';
+import Swal from 'sweetalert2';
 // import "../src/app/styles/main.scss";
 //import '/pages/events/event.scss'; // Ensure your CSS file is correctly linked;
 import '../src/app/styles/user.scss'; // Ensure your CSS file is correctly linked;
@@ -223,7 +224,21 @@ const HomePage = () => {
       .join(""); // Join them together
   };
 
-
+const handleLogout = () => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will be logged out.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Logout',
+    cancelButtonText: 'Cancel',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('ntnumber');
+      window.location.reload(); // or navigate to login
+    }
+  });
+};
 
   return (
     <>
@@ -311,7 +326,9 @@ const HomePage = () => {
                 </div>
                 <div class="text">CP: {cpPoints}</div>  
               </button> */}
-              <div className='userName'> <span>{getInitials(userName)}</span> </div>
+            <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+  <span>{getInitials(userName)}</span>
+</div>
             </div>
 
 
@@ -331,7 +348,7 @@ const HomePage = () => {
  <div className='sectionHeadings'>
       <h2>Nucleus Team Meetings</h2> 
     
-      </div>
+      </div> 
           <div className='container eventList'>
             {eventList ? eventList?.map(doc => (
               <div key={doc.id} className='meetingBox'>

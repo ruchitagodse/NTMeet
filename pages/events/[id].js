@@ -11,6 +11,8 @@ import Modal from 'react-modal';
 import { createMarkup } from '../../component/util';
 import HeaderNav from '../../component/HeaderNav';
 
+import Swal from 'sweetalert2';
+
 
 
 const EventLoginPage = () => {
@@ -36,7 +38,7 @@ const EventLoginPage = () => {
   const [predefinedFeedback, setPredefinedFeedback] = useState("");
   const [customFeedback, setCustomFeedback] = useState("");
   const [currentUserId, setCurrentUserId] = useState('');
-  const [showpopup, setshowpopup] = useState(false);
+  const [showpopup, setshowpopup] = useState(false); 
   const [currentMeetingstatus, setcurrentMeetingstatus] = useState(null);
 const [suggestionText, setSuggestionText] = useState("");
 
@@ -399,15 +401,20 @@ const fetchFeedback = async () => {
     }
   };
 
+
 const submitAddFeedback = async () => {
   if (!suggestionText.trim()) {
-    alert("Please enter a suggestion");
+    Swal.fire({
+      icon: 'warning',
+      title: 'Empty Suggestion',
+      text: 'Please enter a suggestion before submitting.',
+    });
     return;
   }
 
   try {
     await addDoc(collection(db, "suggestions"), {
-      taskDescription: suggestionText, // your main feedback/suggestion
+      taskDescription: suggestionText,
       eventId: id,
       eventName: eventDetails?.name || "Unknown Event",
       createdAt: serverTimestamp(),
@@ -415,15 +422,38 @@ const submitAddFeedback = async () => {
       status: "Pending"
     });
 
-    setSuggestionText(""); // clear field
-    setshowpopup(false);   // close modal
-    console.log("✅ Suggestion submitted");
+    setSuggestionText(""); 
+    setshowpopup(false);   
+
+    Swal.fire({
+      icon: 'success',
+      title: 'Submitted!',
+      text: 'Your suggestion has been added.',
+    });
   } catch (error) {
     console.error("❌ Error saving feedback:", error);
+    Swal.fire({
+      icon: 'error',
+      title: 'Error',
+      text: 'Something went wrong. Please try again.',
+    });
   }
 };
-
-
+const handleLogout = () => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will be logged out.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Logout',
+    cancelButtonText: 'Cancel',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('ntnumber');
+      window.location.reload(); // or navigate to login
+    }
+  });
+};
   const closeAddFeedbackModal = () => {
     setAddFeedbackModalIsOpen(false);
     setPredefinedFeedback('');
@@ -514,7 +544,9 @@ const submitAddFeedback = async () => {
             <div className='innerLogo' onClick={() => router.push('/')}>
               <img src="/ujustlogo.png" alt="Logo" className="logo" />
             </div>
-            <div className='userName'> {userName || 'User'} <span>{getInitials(userName)}</span> </div>
+          <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+  <span>{getInitials(userName)}</span>
+</div>
           </section>
         </header>
 
@@ -628,7 +660,7 @@ const submitAddFeedback = async () => {
                 {/* Button to Open Modal */}
                 {
                   eventDetails?.momUrl ? <button className="suggetionBtn" onClick={() => setshowpopup(true)}>
-                    Suggestion
+                   Add Suggestion
                   </button> : null
                 }
 

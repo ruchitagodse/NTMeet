@@ -5,6 +5,7 @@ import '../src/app/styles/user.scss';
 //import '/pages/events/event.scss'; // Ensure your CSS file is correctly linked
 import { useRouter } from 'next/router';
 import Link from 'next/link'
+import Swal from 'sweetalert2';
 import HeaderNav from '../component/HeaderNav';
 const db = getFirestore(app);
 
@@ -13,7 +14,7 @@ const AllEvents = () => {
    const [userName, setUserName] = useState('');
      const [phoneNumber, setPhoneNumber] = useState('');
    const router = useRouter();
-  useEffect(() => {
+  useEffect(() => { 
     const fetchAllEvents = async () => {
       try {
         const querySnapshot = await getDocs(collection(db, 'MonthlyMeeting'));
@@ -64,7 +65,21 @@ const AllEvents = () => {
       // setError('User not found.');
     }
   };
-  
+  const handleLogout = () => {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will be logged out.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, Logout',
+      cancelButtonText: 'Cancel',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        localStorage.removeItem('ntnumber');
+        window.location.reload(); // or navigate to login
+      }
+    });
+  };
   
   return (
     <>
@@ -75,7 +90,9 @@ const AllEvents = () => {
             <img src="/ujustlogo.png" alt="Logo" className="logo" />
           </div>
           <div>
-            <div className='userName'> {userName || 'User'} <span>{getInitials(userName)}</span> </div>
+             <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+  <span>{getInitials(userName)}</span>
+</div>
           </div>
         </section>
       </header>

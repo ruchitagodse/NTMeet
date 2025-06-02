@@ -7,14 +7,14 @@ import {
   collection,
   getDocs,
   query,
-  orderBy, addDoc, Timestamp, serverTimestamp, onSnapshot
+  orderBy, addDoc, Timestamp, serverTimestamp, onSnapshot,updateDoc,arrayUnion
 } from 'firebase/firestore';
 import '../../src/app/styles/user.scss';
 import { app } from '../../firebaseConfig';
 import HeaderNav from '../../component/HeaderNav';
 import { v4 as uuidv4 } from 'uuid';
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-
+import Swal from 'sweetalert2';
 
 const db = getFirestore(app);
 
@@ -82,22 +82,31 @@ export default function EventDetailsPage() {
   const [uploading, setUploading] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
   const [newComment, setNewComment] = useState('');
-  const handleCommentSubmit = async () => {
-    if (!newComment.trim()) return;
+ const handleCommentSubmit = async () => {
+  if (!newComment.trim()) return;
 
-    try {
-      const commentRef = collection(db, 'suggestions', id, 'comments');
-      await addDoc(commentRef, {
+  if (!activeParentId || !activeSubtaskId) {
+    console.error('Missing parentId or subtaskId');
+    return;
+  }
+
+  try {
+    const subtaskRef = doc(db, 'suggestions', activeParentId, 'subtasks', activeSubtaskId);
+
+    await updateDoc(subtaskRef, {
+      comments: arrayUnion({
         text: newComment,
-        commenterName: userName,
-        createdAt: serverTimestamp(),
-      });
+        by: userName,
+        at: serverTimestamp(),
+      }),
+    });
 
-      setNewComment('');
-    } catch (error) {
-      console.error('Error adding comment:', error);
-    }
-  };
+    setNewComment('');
+  } catch (error) {
+    console.error('Error adding comment:', error);
+  }
+};
+
 
   useEffect(() => {
     if (!id) return; // 'id' is the suggestion/task ID
@@ -167,6 +176,22 @@ export default function EventDetailsPage() {
   };
 
 
+useEffect(() => {
+  if (!id) return;
+
+  const docRef = collection(db, 'suggestions', id, 'documents');
+
+  const unsubscribe = onSnapshot(docRef, (snapshot) => {
+    const docs = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    setDocuments(docs);
+  });
+
+  // Cleanup on unmount
+  return () => unsubscribe();
+}, [id]);
 
   useEffect(() => {
     if (userName) {
@@ -198,39 +223,67 @@ export default function EventDetailsPage() {
       [subtaskId]: comment,
     }));
   };
+const addComment = async (parentId, subtaskId) => {
+  const commentText = commentInputs[subtaskId];
+  if (!commentText?.trim()) return;
 
-  const addComment = async (parentId, subtaskId) => {
-    const commentText = commentInputs[subtaskId];
-    if (!commentText.trim()) return;
+  if (!parentId || !subtaskId) {
+    console.error('Missing parentId or subtaskId', { parentId, subtaskId });
+    return;
+  }
 
-    const subtaskRef = doc(db, 'suggestions', parentId, 'subtasks', subtaskId);
-    await updateDoc(subtaskRef, {
-      comments: arrayUnion({
-        text: commentText,
-        by: userName,
-        at: new Date(),
-      }),
-    });
+  const subtaskRef = doc(db, 'suggestions', parentId, 'subtasks', subtaskId);
+  const docSnap = await getDoc(subtaskRef);
 
-    setCommentInputs((prev) => ({
-      ...prev,
-      [subtaskId]: '',
-    }));
+  if (!docSnap.exists()) {
+    console.error('Subtask document does not exist at:', subtaskRef.path);
+    return;
+  }
 
-    fetchSubtasks();
-  };
+  await updateDoc(subtaskRef, {
+    comments: arrayUnion({
+      text: commentText,
+      by: userName,
+      at: new Date(),
+    }),
+  });
 
-  const markCompleted = async (parentId, subtaskId) => {
-    const subtaskRef = doc(db, 'suggestions', parentId, 'subtasks', subtaskId);
+  setCommentInputs((prev) => ({
+    ...prev,
+    [subtaskId]: '',
+  }));
 
-    await updateDoc(subtaskRef, {
-      status: 'Completed',
-      completedAt: new Date(),
-    });
+  fetchSubtasks(parentId);
+  setIsModalOpen(false); // 👈 Close the modal
+};
 
-    fetchSubtasks();
-  };
+const markCompleted = async (parentId, subtaskId) => {
+  if (!parentId || !subtaskId) {
+    console.error('Missing parentId or subtaskId', { parentId, subtaskId });
+    return;
+  }
 
+  const subtaskRef = doc(db, 'suggestions', parentId, 'subtasks', subtaskId);
+
+  const docSnap = await getDoc(subtaskRef);
+  if (!docSnap.exists()) {
+    console.error('Subtask document does not exist at:', subtaskRef.path);
+    return;
+  }
+
+  await updateDoc(subtaskRef, {
+    status: 'Completed',
+    completedAt: new Date(),
+  });
+
+  fetchSubtasks(parentId);
+};
+
+useEffect(() => {
+  if (id) {
+    fetchSubtasks(id);
+  }
+}, [id, statusFilter]);
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -334,7 +387,21 @@ export default function EventDetailsPage() {
       },
     }));
   };
-
+const handleLogout = () => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will be logged out.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Logout',
+    cancelButtonText: 'Cancel',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('ntnumber');
+      window.location.reload(); // or navigate to login
+    }
+  });
+};
   const addSubtask = async (parentTaskId) => {
     const { desc, assignedTo } = subTaskTexts[parentTaskId] || {};
     if (!desc || !assignedTo) return alert('Subtask fields required');
@@ -576,19 +643,23 @@ export default function EventDetailsPage() {
                             }
                           />
 
-                          <select
-                            value={subTaskTexts[selectedSuggestion.id]?.assignedTo || ''}
-                            onChange={(e) =>
-                              handleSubtaskInput(selectedSuggestion.id, 'assignedTo', e.target.value)
-                            }
-                          >
-                            <option value="">Assign To</option>
-                            {ntMembers.map((member) => (
-                              <option key={member.name} value={member.name}>
-                                {member.name}
-                              </option>
-                            ))}
-                          </select>
+                       <select
+  value={subTaskTexts[selectedSuggestion.id]?.assignedTo || ''}
+  onChange={(e) =>
+    handleSubtaskInput(selectedSuggestion.id, 'assignedTo', e.target.value)
+  }
+>
+  <option value="">Assign To</option>
+  {ntMembers
+    .slice() // create a shallow copy to avoid mutating original
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((member) => (
+      <option key={member.name} value={member.name}>
+        {member.name}
+      </option>
+    ))}
+</select>
+
 
                           <button onClick={() => addSubtask(selectedSuggestion.id)}>Create Subtask</button>
                         </>
@@ -787,6 +858,7 @@ export default function EventDetailsPage() {
                               ? new Date(sub.date.seconds * 1000).toLocaleDateString()
                               : "N/A"}
                           </p>
+                             <h4 className="task-heading">{sub.taskDescription || 'Subtask'}</h4>
                         </div>
                         
                         <span className={sub.status === "Completed" ? "meetingLable" : "meetingLable3"}>
@@ -797,7 +869,7 @@ export default function EventDetailsPage() {
                       {isOpen && (
                         <>
                           <div className="task-details">
-    <h4 className="task-heading">{sub.taskDescription || 'Subtask'}</h4>
+ 
                             <p className="assigned-to">
                               {/* <strong>Assigned To:</strong> {sub.assignedTo || 'Unassigned'} */}
                             </p>
@@ -820,26 +892,34 @@ export default function EventDetailsPage() {
 
                             <div className="meeting-box-footer">
                               {sub.status === 'Pending' && (
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    markCompleted(sub.parentId, sub.id);
-                                  }}
-                                  className="actionBtn"
-                                >
-                                  Mark as Completed
-                                </button>
+ <button
+  onClick={(e) => {
+    e.stopPropagation();
+    markCompleted(id, sub.id); // both values should now be correct
+  }}
+  className="actionBtn"
+>
+  Mark as Completed
+</button>
+
+
                               )}
 
-                              <button
-                                className="actionBtn blueclr"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  openModal(sub.id);
-                                }}
-                              >
-                                Add Comment
-                              </button>
+<button
+className='actionBtn blueclr'
+  onClick={(e) => {
+    e.stopPropagation();
+    setActiveParentId(id); // Use the route param `id` directly here!
+    setActiveSubtaskId(sub.id);
+    setIsModalOpen(true);
+  }}
+>
+  Add Comment
+</button>
+
+
+
+
                             </div>
 
                           </div>
@@ -867,12 +947,10 @@ export default function EventDetailsPage() {
                   />
                   <ul className="actionBtns">
                     <li>
-                      <button
-                        onClick={() => addComment(activeParentId, activeSubtaskId)}
-                        className="m-button"
-                      >
-                        Submit
-                      </button>
+                    <button onClick={() => addComment(activeParentId, activeSubtaskId)} className="m-button">
+  Submit
+</button>
+
                     </li>
                     <li>
                       <button onClick={closeModal} className="m-button-2">Cancel</button>
@@ -897,7 +975,10 @@ export default function EventDetailsPage() {
               <img src="/ujustlogo.png" alt="Logo" className="logo" />
             </div>
             <div>
-              <div className='userName'> {userName || 'User'} <span>{getInitials(userName)}</span> </div>
+                <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+  <span>{getInitials(userName)}</span>
+</div>
+
             </div>
           </section>
         </header>
@@ -910,30 +991,33 @@ export default function EventDetailsPage() {
               </span>
               <h2 className="event-title">{suggestion?.eventName || 'Event Details'}</h2>
               <div className='names'>
-                <p className="event-category with-dot dot-blue">
-                  Owned by {suggestion?.assignedTo}
-                </p>
+             {suggestion?.assignedTo && (
+  <p className="event-category with-dot dot-blue">
+    Owned by {suggestion.assignedTo}
+  </p>
+)}
+
                 <p className="event-owner with-dot dot-green">
                   Suggested by {suggestion?.createdBy}
                 </p>
 
 
               </div>
-              <div className="event-meta">
-                <div className="due-date">
-                  Date:{" "}
-                  <strong>
-                    {new Date(suggestion?.date?.seconds * 1000).toLocaleDateString(undefined, {
-                      day: 'numeric',
-                      month: 'long', // Full month name like "May"
-                      year: 'numeric',
-                    })}
-                  </strong>
-                </div>
+           <div className="event-meta">
+  {suggestion?.date?.seconds && (
+    <div className="due-date">
+      Date:{" "}
+      <strong>
+        {new Date(suggestion.date.seconds * 1000).toLocaleDateString(undefined, {
+          day: 'numeric',
+          month: 'long',
+          year: 'numeric',
+        })}
+      </strong>
+    </div>
+  )}
+</div>
 
-
-
-              </div>
               {/* <div className="priority-tag">
                 Priority <span className="priority-value">Medium</span>
               </div> */}

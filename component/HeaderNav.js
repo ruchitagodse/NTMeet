@@ -121,16 +121,16 @@ function HeaderNav() {
             </div>
          <div className="icon-wrapper" title="NT Meetings">
   <GrBraille size={26} onClick={() => router.push("/NTmeetdetails")} />
-</div>
+</div> 
 <div className="icon-wrapper" title="Monthly Meetings">
   <MdOutlineBusinessCenter size={26} onClick={() => router.push("/Monthlymeetdetails")} />
 </div>
 <div className="icon-wrapper" title="Suggestions">
   <TbBulb size={26} onClick={() => router.push("/SuggestionList")} />
-</div>
-<div className="icon-wrapper" title="CP Details">
+</div> 
+ <div className="icon-wrapper" title="CP Details">
   <BiSolidCoinStack size={26} onClick={() => router.push(`/cp-details/${phoneNumber}`)} />
-</div>
+</div> 
 
         </div>
     );

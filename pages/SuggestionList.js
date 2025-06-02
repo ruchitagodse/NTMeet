@@ -15,7 +15,9 @@ import Link from 'next/link'
 import '../src/app/styles/user.scss';
 import HeaderNav from '../component/HeaderNav';
 import { FaFilter } from "react-icons/fa";
+import Swal from 'sweetalert2';
 // import './SuggestionList.scss';
+import { BiComment } from "react-icons/bi";
 
 const SuggestionList = () => {
 
@@ -166,7 +168,21 @@ const fetchUserName = async (phoneNumber) => {
   fetchSuggestions();
 }, []);
 
-
+const handleLogout = () => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will be logged out.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Logout',
+    cancelButtonText: 'Cancel',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('ntnumber');
+      window.location.reload(); // or navigate to login
+    }
+  });
+};
   const handleStatusChange = async (id, newStatus) => {
     const suggestionRef = doc(db, 'suggestions', id);
     await updateDoc(suggestionRef, { status: newStatus });
@@ -213,7 +229,10 @@ const fetchUserName = async (phoneNumber) => {
             <img src="/ujustlogo.png" alt="Logo" className="logo" />
           </div>
           <div>
-            <div className='userName'> {userName || 'User'} <span>{getInitials(userName)}</span> </div>
+            <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+  <span>{getInitials(userName)}</span>
+</div>
+
           </div>
         </section>
       </header>
@@ -274,18 +293,19 @@ const fetchUserName = async (phoneNumber) => {
                 {/* {task.assignedTo && <p><strong>Assigned To:</strong> {task.assignedTo}</p>} */}
               </div>
 
-              <div className="comments-section">
-            <Link href={`/suggestions/${task.id}?tab=Comments`}>
-  <div className="comment-count">
-    {task.comments && task.comments.length > 0 ? (
-      <small>{task.comments.length} comment{task.comments.length > 1 ? 's' : ''}</small>
-    ) : (
-      <small>No comments yet</small>
-    )}
-  </div>
-</Link>
+         <div className="comments-section">
+  <Link href={`/suggestions/${task.id}?tab=Comments`}>
+    <div className="comment-count">
+      {task.comments && task.comments.length > 0 ? (
+        <small><BiComment /> {task.comments.length}</small>
+      ) : (
+        <small><BiComment/> 0</small>
+      )}
+    </div>
+  </Link>
+</div>
 
-              </div>
+            
 
               <div className='meetingBoxFooter'>
                 <div className='viewDetails'>

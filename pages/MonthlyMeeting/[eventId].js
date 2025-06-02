@@ -7,6 +7,7 @@ import {
   collection,
   getDocs
 } from 'firebase/firestore';
+import Swal from 'sweetalert2';
 import '../../src/app/styles/main.scss';
 //import '/pages/events/frontend.scss';
 //import '/pages/events/event.scss';
@@ -112,7 +113,21 @@ export default function EventDetailsPage() {
       setUserName(userDoc.data().name);
     }
   };
-
+const handleLogout = () => {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: 'You will be logged out.',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonText: 'Yes, Logout',
+    cancelButtonText: 'Cancel',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      localStorage.removeItem('ntnumber');
+      window.location.reload(); // or navigate to login
+    }
+  });
+};
   const renderTabContent = () => {
     if (!eventInfo) return <div className='loader'><span className="loader2"></span></div>
 
@@ -273,7 +288,7 @@ export default function EventDetailsPage() {
               <p>Yet to be uploaded</p>
             )}
           </>
-        );
+        ); 
 
       case 'One2One':
         return (
@@ -456,7 +471,9 @@ export default function EventDetailsPage() {
                 </div>
                 <div class="text">CP: {cpPoints}</div>  
               </button> */}
-              <div className='userName'> <span>{getInitials(userName)}</span> </div>
+            <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+  <span>{getInitials(userName)}</span>
+</div>
             </div>
 
 
