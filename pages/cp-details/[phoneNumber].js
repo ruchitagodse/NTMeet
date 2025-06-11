@@ -132,7 +132,7 @@ const CPDetails = () => {
           </div>
 
           {filteredActivities.length === 0 ? (
-            <p>No activities found.</p>
+            <p style={{paddingLeft:'15px'}}>No activities found.</p>
           ) : (
             <div className="container suggestionList">
               {filteredActivities.map((activity) => (

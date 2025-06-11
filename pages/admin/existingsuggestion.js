@@ -28,7 +28,7 @@ const CreateSuggestionTask = () => {
 
   const fetchUserName = async (phoneNumber) => {
     if (!phoneNumber) return;
-    const userRef = doc(db, 'NTMember', phoneNumber);
+    const userRef = doc(db, 'NTMembers', phoneNumber);
     const userDoc = await getDoc(userRef);
     if (userDoc.exists()) {
       const data = userDoc.data();

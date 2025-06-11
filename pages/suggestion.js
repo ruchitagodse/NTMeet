@@ -142,7 +142,7 @@ const fetchFeedback = async () => {
 
   const fetchUserName = async (phoneNumber) => {
     console.log("Fetch User from NTMember", phoneNumber);
-    const userRef = doc(db, 'NTMember', phoneNumber);
+    const userRef = doc(db, 'NTMembers', phoneNumber);
     const userDoc = await getDoc(userRef);
 
     console.log("Check Details", userDoc.data());

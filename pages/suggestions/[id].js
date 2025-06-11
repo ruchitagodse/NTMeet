@@ -314,7 +314,7 @@ useEffect(() => {
     setNtMembers(members);
   };
   const fetchUserName = async (phoneNumber) => {
-    const userRef = doc(db, 'NTMember', phoneNumber);
+    const userRef = doc(db, 'NTMembers', phoneNumber);
     const userDoc = await getDoc(userRef);
     if (userDoc.exists()) {
       setUserName(userDoc.data().name);

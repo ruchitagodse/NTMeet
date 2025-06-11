@@ -8,7 +8,7 @@ import {
   getDocs
 } from 'firebase/firestore';
 import Swal from 'sweetalert2';
-import '../../src/app/styles/main.scss';
+//import '../../src/app/styles/main.scss';
 //import '/pages/events/frontend.scss';
 //import '/pages/events/event.scss';
 import '../../src/app/styles/user.scss';
@@ -107,7 +107,7 @@ export default function EventDetailsPage() {
   }, []);
 
   const fetchUserName = async (phoneNumber) => {
-    const userRef = doc(db, 'NTMember', phoneNumber);
+    const userRef = doc(db, 'NTMembers', phoneNumber);
     const userDoc = await getDoc(userRef);
     if (userDoc.exists()) {
       setUserName(userDoc.data().name);
@@ -131,7 +131,7 @@ const handleLogout = () => {
   const renderTabContent = () => {
     if (!eventInfo) return <div className='loader'><span className="loader2"></span></div>
 
-    switch (activeTab) {
+   switch (activeTab) {
       case 'agenda':
         return (
           <>
@@ -179,7 +179,18 @@ const handleLogout = () => {
             )}
           </>
         );
-
+  case 'Topic of the Day':
+        return (
+          <>
+            <h3>Topic of the Day</h3>
+         <div>
+           <p><strong>Title: </strong>{eventInfo?.titleOfTheDay || 'No Topic'}</p>
+                   <p><strong>Description: </strong>{eventInfo?.description || 'No Description'}</p>
+            
+                 </div>
+             
+          </>
+        );
       case 'facilitators':
         return (
           <>
@@ -192,7 +203,7 @@ const handleLogout = () => {
                 </div>
               ))
             ) : (
-              <p>Yet to be uploaded</p>
+              <p>No Facilitators Identified</p>
             )}
           </>
         );
@@ -210,24 +221,26 @@ const handleLogout = () => {
                 </div>
               ))
             ) : (
-              <p>Yet to be uploaded</p>
+              <p>No Knowledge Sharing Session</p>
             )}
           </>
         );
 
-      case 'New prospects':
+      case 'New energy':
         return (
           <>
             <h3>Prospects Identified</h3>
             {eventInfo.prospectSections?.length > 0 ? (
               eventInfo.prospectSections.map((p, idx) => (
                 <div key={idx}>
-                  <strong>{p.prospect}</strong> ({p.prospectName}):
+                      <p><strong>Orbiter's Name: </strong> {p.prospect}</p>
+                        <p><strong>Prospect's Name: </strong> {p.prospectName}</p>
+                 
                   <p>{p.prospectDescription}</p>
                 </div>
               ))
             ) : (
-              <p>Yet to be uploaded</p>
+              <p>No New Energies</p>
             )}
           </>
         );
@@ -242,10 +255,11 @@ const handleLogout = () => {
                   <p><strong>From: </strong> {r.referralFrom}</p>
                   <p><strong>To: </strong> {r.referralTo}</p>
                   <p><strong>Description:</strong> {r.referralDesc}</p>
+                    <p><strong>Status:</strong> {r.status || 'Not specified'}</p>
                 </div>
               ))
             ) : (
-              <p>Yet to be uploaded</p>
+              <p>No Referrals Identified</p>
             )}
           </>
         );
@@ -258,39 +272,40 @@ const handleLogout = () => {
               eventInfo.requirementSections.map((req, idx) => (
                 <div key={idx}>
                   <p><strong>From:</strong> {req.reqfrom} — {req.reqDescription}</p>
+                    
                 </div>
               ))
             ) : (
-              <p>Yet to be uploaded</p>
+              <p>No Requirements Identified</p>
             )}
           </>
         );
 
       case 'E2A':
-        return (
-          <>
-            <h3>E2A</h3>
-            {eventInfo.e2aSections?.length > 0 ? (
-              eventInfo.e2aSections.map((e2a, idx) => {
-                const formattedDate = new Date(e2a.e2aDate).toLocaleDateString('en-GB');
-                return (
-                  <div key={idx}>
-                    <div>
-                      <p><strong>{e2a.e2a}</strong></p>
-                      <p>{formattedDate}</p>
-                    </div>
+  return (
+    <>
+      <h3>E2A</h3>
+      {eventInfo.e2aSections?.length > 0 ? (
+        eventInfo.e2aSections.map((e2a, idx) => {
+          const formattedDate = new Date(e2a.e2aDate).toLocaleDateString('en-GB');
+          return (
+            <div key={idx} style={{ border: '1px solid #ccc', marginBottom: '1rem', padding: '1rem' }}>
+              <div>
+                <p><strong>{e2a.e2a}</strong> {e2a.status ? '✅ Done' : ''}</p>
+                <p>{formattedDate}</p>
+              </div>
+              <p>{e2a.e2aDesc}</p>
+            </div>
+          );
+        })
+      ) : (
+        <p>No E2A </p>
+      )}
+    </>
+  );
 
-                    <p>{e2a.e2aDesc}</p>
-                  </div>
-                );
-              })
-            ) : (
-              <p>Yet to be uploaded</p>
-            )}
-          </>
-        ); 
 
-      case 'One2One':
+      case 'One to One Interaction':
         return (
           <>
             <h3>One to One Interactions</h3>
@@ -305,12 +320,12 @@ const handleLogout = () => {
                 );
               })
             ) : (
-              <p>Yet to be uploaded</p>
+              <p>No One to One Interactions</p>
             )}
           </>
         );
 
-      case 'Registration':
+      case 'Registrations':
         return (
           <>
             <h3>Registered Users</h3>
@@ -372,7 +387,7 @@ const handleLogout = () => {
                 }
               </>
             ) : (
-              <p>Yet to be uploaded</p>
+              <p>No Feedback</p>
             )}
           </>
         );
@@ -384,6 +399,8 @@ const handleLogout = () => {
     }
   };
 
+
+    
 
   return (
     <>
@@ -509,7 +526,7 @@ const handleLogout = () => {
                   </div>
                 ) : (
                   <div className="countdown">
-                    <div className="meeting-done">Meeting Done</div>
+                    <div className="meeting-done">Completed</div>
                   </div>
                 )}
 
@@ -524,7 +541,14 @@ const handleLogout = () => {
 
                   {/* <p className="organizer">Organized by Malia Steav</p> */}
                   <p className="event-date">
-                    {eventInfo?.time ? new Date(eventInfo.time.seconds * 1000).toLocaleString() : 'Event'}
+                    {eventInfo?.time ? new Date(eventInfo.time.seconds * 1000).toLocaleString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+}).replace(',', ' at') : 'Event'}
                   </p>
                 </div>
 
@@ -555,8 +579,8 @@ const handleLogout = () => {
                 <div className='eventinnerContent'>
                   <div className="tabs">
                     {[
-                      'agenda', 'MoM', 'facilitators', 'Knowledge Sharing',
-                      'New prospects', 'referrals', 'requirements', 'E2A', 'One2One', 'Registration', 'feedback'
+                      'agenda', 'Registrations','facilitators', 'Knowledge Sharing',
+                      'New energy', 'Topic of the Day','referrals','One to One Interaction', 'requirements','E2A' ,'MoM','feedback'
                     ].map(tab => (
                       <button
                         key={tab}

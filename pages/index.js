@@ -81,6 +81,29 @@ const HomePage = () => {
     if (hours > 0) return `${hours}h ${minutes}m left`;
     return `${minutes}m left`;
   }
+useEffect(() => {
+  if (!phoneNumber) return; // 👈 important check
+
+  const fetchCP = async () => {
+    try {
+      const activitiesRef = collection(db, "Orbiters", phoneNumber, "activities");
+      const activitiesSnapshot = await getDocs(activitiesRef);
+
+      let totalCP = 0;
+
+      activitiesSnapshot.forEach((doc) => {
+        const data = doc.data();
+        totalCP += Number(data?.points) || 0;
+      });
+
+      setCPPoints(totalCP);
+    } catch (error) {
+      console.error("Error fetching CP points:", error);
+    }
+  };
+
+  fetchCP();
+}, [phoneNumber]);
 
   useEffect(() => {
     const fetchDashboardCounts = async () => {
@@ -299,7 +322,6 @@ const handleLogin = async (e) => {
 
 
 
-
   // if (loading) {
   //   return (
   //     <div className="loader-container">
@@ -333,14 +355,85 @@ const handleLogin = async (e) => {
               <img src="/ujustlogo.png" alt="Logo" className="logo" />
             </div>
 
-            <div className='headerRight'>
-            
-       <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
-  <span>{getInitials(userName)}</span>
-</div>
+       <div className='headerRight'>
+              <button onClick={() => router.push(`/cp-details/${phoneNumber}`)} class="reward-btn">
+                <div class="IconContainer">
+                  <svg
+                    class="box-top box"
+                    viewBox="0 0 60 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2 18L58 18"
+                      stroke="#6A8EF6"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                    ></path>
+                    <circle
+                      cx="20.5"
+                      cy="9.5"
+                      r="7"
+                      fill="#101218"
+                      stroke="#6A8EF6"
+                      stroke-width="5"
+                    ></circle>
+                    <circle
+                      cx="38.5"
+                      cy="9.5"
+                      r="7"
+                      fill="#101218"
+                      stroke="#6A8EF6"
+                      stroke-width="5"
+                    ></circle>
+                  </svg>
 
+                  <svg
+                    class="box-body box"
+                    viewBox="0 0 58 44"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <mask id="path-1-inside-1_81_19" fill="white">
+                      <rect width="58" height="44" rx="3"></rect>
+                    </mask>
+                    <rect
+                      width="58"
+                      height="44"
+                      rx="3"
+                      fill="#101218"
+                      stroke="#6A8EF6"
+                      stroke-width="8"
+                      mask="url(#path-1-inside-1_81_19)"
+                    ></rect>
+                    <line
+                      x1="-3.61529e-09"
+                      y1="29"
+                      x2="58"
+                      y2="29"
+                      stroke="#6A8EF6"
+                      stroke-width="6"
+                    ></line>
+                    <path
+                      d="M45.0005 20L36 3"
+                      stroke="#6A8EF6"
+                      stroke-width="5"
+                      stroke-linecap="round"
+                    ></path>
+                    <path
+                      d="M21 3L13.0002 19.9992"
+                      stroke="#6A8EF6"
+                      stroke-width="5"
+                      stroke-linecap="round"
+                    ></path>
+                  </svg>
+
+                  <div class="coin"></div>
+                </div>
+                <div class="text">CP: {cpPoints}</div>  
+              </button>
+              <div className='userName'> <span>{getInitials(userName)}</span> </div>
             </div>
-
 
 
 
@@ -350,7 +443,7 @@ const handleLogin = async (e) => {
         <section className='dashBoardMain'>
           <div className='container pageHeading'>
             <h1>Hi {userName || 'User'}</h1>
-            <p>Let's Create Brand Ambasaddor through Contribution</p>
+            <p>Let's Create Brand Ambassador through Contribution</p>
           </div>
 
 
@@ -376,102 +469,135 @@ const handleLogin = async (e) => {
             <Link href="/SuggestionList">
               <div className="summary-card completed" style={{ cursor: 'pointer' }}>
                 <p className="count">{pendingSuggestionCount}</p>
-                <p className="label">Pending Tasks</p>
+                <p className="label">Pending Suggestions</p>
               </div>
             </Link>
           </section>
 
 
           <section className="upcoming-events">
-            <h1>Upcoming Events</h1>
-            {upcomingMonthlyMeet && (
-              <div className="meetingBox">
-                <div className="suggestionDetails">
-                  {/* Calculate time left for Monthly Meeting */}
-                  {(() => {
-                    const now = new Date();
-                    const eventDate = upcomingMonthlyMeet.time?.toDate ? upcomingMonthlyMeet.time.toDate() : upcomingMonthlyMeet.time;
-                    const timeLeftMs = eventDate - now;
-                    const timeLeft = timeLeftMs <= 0 ? 'Meeting Ended' : formatTimeLeft(timeLeftMs);
-                    // formatTimeLeft is a helper to display time remaining, you can customize it
-                    return timeLeft === 'Meeting Ended' ? (
-                      <span className="meetingLable2">Meeting Done</span>
-                    ) : (
-                      <span className="meetingLable3">{timeLeft}</span>
-                    );
-                  })()}
-                  <span className="suggestionTime">{upcomingMonthlyMeet.time?.toDate ? upcomingMonthlyMeet.time.toDate().toLocaleString() : upcomingMonthlyMeet.time.toLocaleString()}</span>
-                </div>
+  <h1>Upcoming Events</h1>
 
-                <div className="meetingDetailsBox">
-                  <h3 className="eventName">{upcomingMonthlyMeet.Eventname || 'N/A'}</h3>
-                </div>
+  {upcomingMonthlyMeet && (
+    <div className="meetingBox">
+      <div className="suggestionDetails">
+        {(() => {
+          const now = new Date();
+          const eventDate = upcomingMonthlyMeet.time?.toDate ? upcomingMonthlyMeet.time.toDate() : upcomingMonthlyMeet.time;
+          const timeLeftMs = eventDate - now;
+          const timeLeft = timeLeftMs <= 0 ? 'Meeting Ended' : formatTimeLeft(timeLeftMs);
+          return timeLeft === 'Meeting Ended' ? (
+            <span className="meetingLable2">Meeting Done</span>
+          ) : (
+            <span className="meetingLable3">{timeLeft}</span>
+          );
+        })()}
+        <span className="suggestionTime">
+          {upcomingMonthlyMeet.time?.toDate
+            ? upcomingMonthlyMeet.time.toDate().toLocaleString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+}).replace(',', ' at')
+            : upcomingMonthlyMeet.time.toLocaleString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+}).replace(',', ' at')}
+        </span>
+      </div>
 
-                <div className="meetingBoxFooter">
-                  <div className="viewDetails">
-                    <Link href={`/MonthlyMeeting/${upcomingMonthlyMeet.id}`}>View Details</Link>
-                  </div>
+      <div className="meetingDetailsBox">
+        <h3 className="eventName">{upcomingMonthlyMeet.Eventname || 'N/A'}</h3>
+      </div>
 
-                  {(() => {
-                    const now = new Date();
-                    const eventDate = upcomingMonthlyMeet.time?.toDate ? upcomingMonthlyMeet.time.toDate() : upcomingMonthlyMeet.time;
-                    const isUpcoming = eventDate > now;
-                    return isUpcoming && upcomingMonthlyMeet.zoomLink ? (
-                      <div className="meetingLink">
-                        <a href={upcomingMonthlyMeet.zoomLink} target="_blank" rel="noopener noreferrer">
-                          <span>Join Meeting</span>
-                        </a>
-                      </div>
-                    ) : null;
-                  })()}
-                </div>
-              </div>
-            )}
+      <div className="meetingBoxFooter">
+        <div className="viewDetails">
+          <Link href={`/MonthlyMeeting/${upcomingMonthlyMeet.id}`}>View Details</Link>
+        </div>
 
-            {upcomingNTMeet && (
-              <div className="meetingBox">
-                <div className="suggestionDetails">
+        {(() => {
+          const now = new Date();
+          const eventDate = upcomingMonthlyMeet.time?.toDate ? upcomingMonthlyMeet.time.toDate() : upcomingMonthlyMeet.time;
+          const isWithinOneHour = eventDate > now && (eventDate - now <= 60 * 60 * 1000);
+          return isWithinOneHour && upcomingMonthlyMeet.zoomLink ? (
+            <div className="meetingLink">
+              <a href={upcomingMonthlyMeet.zoomLink} target="_blank" rel="noopener noreferrer">
+                <span>Join Meeting</span>
+              </a>
+            </div>
+          ) : null;
+        })()}
+      </div>
+    </div>
+  )}
 
-                  {/* Same time left calculation */}
-                  {(() => {
-                    const now = new Date();
-                    const eventDate = upcomingNTMeet.time?.toDate ? upcomingNTMeet.time.toDate() : upcomingNTMeet.time;
-                    const timeLeftMs = eventDate - now;
-                    const timeLeft = timeLeftMs <= 0 ? 'Meeting Ended' : formatTimeLeft(timeLeftMs);
-                    return timeLeft === 'Meeting Ended' ? (
-                      <span className="meetingLable2">Meeting Done</span>
-                    ) : (
-                      <span className="meetingLable3">{timeLeft}</span>
-                    );
-                  })()}
-                  <span className="suggestionTime">{upcomingNTMeet.time?.toDate ? upcomingNTMeet.time.toDate().toLocaleString() : upcomingNTMeet.time.toLocaleString()}</span>
-                </div>
+  {upcomingNTMeet && (
+    <div className="meetingBox">
+      <div className="suggestionDetails">
+        {(() => {
+          const now = new Date();
+          const eventDate = upcomingNTMeet.time?.toDate ? upcomingNTMeet.time.toDate() : upcomingNTMeet.time;
+          const timeLeftMs = eventDate - now;
+          const timeLeft = timeLeftMs <= 0 ? 'Meeting Ended' : formatTimeLeft(timeLeftMs);
+          return timeLeft === 'Meeting Ended' ? (
+            <span className="meetingLable2">Meeting Done</span>
+          ) : (
+            <span className="meetingLable3">{timeLeft}</span>
+          );
+        })()}
+        <span className="suggestionTime">
+          {upcomingNTMeet.time?.toDate
+            ? upcomingNTMeet.time.toDate().toLocaleString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+}).replace(',', ' at')
+            : upcomingNTMeet.time.toLocaleString('en-GB', {
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+  hour: 'numeric',
+  minute: '2-digit',
+  hour12: true,
+}).replace(',', ' at')}
+        </span>
+      </div>
 
-                <div className="meetingDetailsBox">
-                  <h3 className="eventName">{upcomingNTMeet.name || 'N/A'}</h3>
-                </div>
+      <div className="meetingDetailsBox">
+        <h3 className="eventName">{upcomingNTMeet.name || 'N/A'}</h3>
+      </div>
 
-                <div className="meetingBoxFooter">
-                  <div className="viewDetails">
-                    <Link href={`/events/${upcomingNTMeet.id}`}>View Details</Link>
-                  </div>
+      <div className="meetingBoxFooter">
+        <div className="viewDetails">
+          <Link href={`/events/${upcomingNTMeet.id}`}>View Details</Link>
+        </div>
 
-                  {(() => {
-                    const now = new Date();
-                    const eventDate = upcomingNTMeet.time?.toDate ? upcomingNTMeet.time.toDate() : upcomingNTMeet.time;
-                    const isUpcoming = eventDate > now;
-                    return isUpcoming && upcomingNTMeet.zoomLink ? (
-                      <div className="meetingLink">
-                        <a href={upcomingNTMeet.zoomLink} target="_blank" rel="noopener noreferrer">
-                          <span>Join Meeting</span>
-                        </a>
-                      </div>
-                    ) : null;
-                  })()}
-                </div>
-              </div>
-            )}
-          </section>
+        {(() => {
+          const now = new Date();
+          const eventDate = upcomingNTMeet.time?.toDate ? upcomingNTMeet.time.toDate() : upcomingNTMeet.time;
+          const isWithinOneHour = eventDate > now && (eventDate - now <= 60 * 60 * 1000);
+          return isWithinOneHour && upcomingNTMeet.zoomLink ? (
+            <div className="meetingLink">
+              <a href={upcomingNTMeet.zoomLink} target="_blank" rel="noopener noreferrer">
+                <span>Join Meeting</span>
+              </a>
+            </div>
+          ) : null;
+        })()}
+      </div>
+    </div>
+  )}
+</section>
 
 
 

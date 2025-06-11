@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import * as React from 'react';
 import { db } from '../firebaseConfig';
 import Link from 'next/link'
-import { doc, getDoc, collection, getDocs, setDoc } from 'firebase/firestore';
+import { doc, getDoc, collection, getDocs, setDoc,Timestamp,addDoc } from 'firebase/firestore';
 import axios from 'axios';
 import Swal from 'sweetalert2';
 // import "../src/app/styles/main.scss";
@@ -13,6 +13,7 @@ import HeaderNav from '../component/HeaderNav';
 
 const HomePage = () => {
   const router = useRouter();
+    const [showpopup, setshowpopup] = useState(false); 
   const { id } = router.query; // Get event name from URL
   const [phoneNumber, setPhoneNumber] = useState('');
  const [value, setValue] = React.useState(0);
@@ -26,7 +27,7 @@ const HomePage = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showModal, setShowModal] = useState(false); // State to show/hide modal
   const [member, setMember] = useState([]); // Store fetched members
-
+const [suggestionText, setSuggestionText] = useState("");
 
   useEffect(() => {
     const storedPhoneNumber = localStorage.getItem("ntnumber");
@@ -133,7 +134,7 @@ const HomePage = () => {
 
   const fetchUserName = async (phoneNumber) => {
     console.log("Fetch User from NTMember", phoneNumber);
-    const userRef = doc(db, 'NTMember', phoneNumber);
+    const userRef = doc(db, 'NTMembers', phoneNumber);
     const userDoc = await getDoc(userRef);
 
     console.log("Check Details", userDoc.data());
@@ -161,6 +162,26 @@ const HomePage = () => {
 
 
 
+const submitAddFeedback = async () => {
+  if (!suggestionText.trim()) return;
+
+  const newSuggestion = {
+    taskDescription: suggestionText,
+    createdAt: Timestamp.now(),
+    createdBy: userName || "Anonymous",
+    date: Timestamp.now(),
+    eventName: eventDetails?.Eventname || "Common Suggestion",
+    status: "Pending",
+  };
+
+  try {
+    await addDoc(collection(db, "suggestions"), newSuggestion);
+    setSuggestionText("");
+    setshowpopup(false);
+  } catch (error) {
+    console.error("Error adding suggestion:", error);
+  }
+};
 
 
   if (!isLoggedIn) {
@@ -345,8 +366,34 @@ const handleLogout = () => {
           </div>
        
 
- <div className='sectionHeadings'>
-      <h2>Nucleus Team Meetings</h2> 
+<div className='sectionHeadings'>
+  <h2>Nucleus Team Meetings</h2>
+  <button onClick={() => setshowpopup(true)} className="addsuggestion">
+    + Suggestion
+  </button>
+{showpopup && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <h3>Add Suggestion</h3>
+      <textarea
+        rows={4}
+        value={suggestionText}
+        placeholder="Write your comment..."
+        onChange={(e) => setSuggestionText(e.target.value)}
+      />
+      <ul className="actionBtns">
+        <li>
+          <button onClick={submitAddFeedback} className="m-button">Submit</button>
+        </li>
+        <li>
+          <button onClick={() => setshowpopup(false)} className="m-button-2">Cancel</button>
+        </li>
+      </ul>
+    </div>
+  </div>
+)}
+
+
     
       </div> 
           <div className='container eventList'>

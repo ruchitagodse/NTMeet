@@ -42,105 +42,45 @@ const EventLoginPage = () => {
   const [currentMeetingstatus, setcurrentMeetingstatus] = useState(null);
 const [suggestionText, setSuggestionText] = useState("");
 
-const fetchFeedback = async () => {
-  setLoading(true);
-  try {
-    const suggestionCollection = collection(db, "suggestions");
-    const suggestionSnapshot = await getDocs(suggestionCollection);
-    const allFeedback = suggestionSnapshot.docs.map((docSnap) => {
-      const data = docSnap.data();
-      return {
-        id: docSnap.id,
-        eventId: data.eventId || "Unknown",
-        eventName: data.eventName || "Unknown Event",
-        assignedTo: data.assignedTo || "Unassigned",
-        taskDescription: data.taskDescription || "No Description",
-        status: data.status || "Yet to be Discussed",
-        createdBy: data.createdBy || "Unknown",
-        date: data.date?.seconds
-          ? new Date(data.date.seconds * 1000).toLocaleDateString()
-          : "Yet To Be Assigned",
-      };
-    });
 
-    setFeedbackList(allFeedback); // use this in your UI
-  } catch (error) {
-    console.error("Error fetching suggestions:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+  const fetchFeedback = async () => {
+    setLoading(true);
+    try {
+      const suggestionCollection = collection(db, "suggestions");
+      const suggestionSnapshot = await getDocs(suggestionCollection);
+      const filteredFeedback = suggestionSnapshot.docs
+        .map((docSnap) => {
+          const data = docSnap.data();
+          return {
+            id: docSnap.id,
+            eventId: data.eventId || "Unknown",
+            eventName: data.eventName || "Unknown Event",
+            assignedTo: data.assignedTo || "Unassigned",
+            taskDescription: data.taskDescription || "No Description",
+            status: data.status || "Yet to be Discussed",
+            createdBy: data.createdBy || "Unknown",
+            date: data.date?.seconds
+              ? new Date(data.date.seconds * 1000).toLocaleDateString()
+              : "Yet To Be Assigned",
+          };
+        })
+        .filter((item) => item.eventId === id); // use id from params here
 
+      setFeedbackList(filteredFeedback);
+    } catch (error) {
+      console.error("Error fetching suggestions:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  // const fetchFeedback = async () => {
-  //   setLoading(true);
-  //   try {
-  //     const eventsCollection = collection(db, "NTmeet");
-  //     const eventsSnapshot = await getDocs(eventsCollection);
-  //     let allFeedback = [];
+  useEffect(() => {
+    if (id) {
+      fetchFeedback();
+    }
+  }, [id]);
 
-  //     for (const eventDoc of eventsSnapshot.docs) {
-  //       const eventData = eventDoc.data();
-  //       const eventId = eventDoc.id;
-  //       const eventName = eventData.name || "Unknown Event";
-
-  //       const usersCollection = collection(db, `NTmeet/${eventId}/registeredUsers`);
-  //       const usersSnapshot = await getDocs(usersCollection);
-
-  //       for (const userDoc of usersSnapshot.docs) {
-  //         const userData = userDoc.data();
-  //         const phoneNumber = userData.phoneNumber || "";
-
-  //         let userName = "Unknown User";
-  //         if (phoneNumber) {
-  //           const membersCollection = collection(db, "NTMember");
-  //           const q = query(membersCollection, where("phoneNumber", "==", phoneNumber));
-  //           const membersSnapshot = await getDocs(q);
-  //           if (!membersSnapshot.empty) {
-  //             const memberData = membersSnapshot.docs[0].data();
-  //             userName = memberData.name || "Unknown User";
-
-  //           }
-  //         }
-
-  //         if (userData.feedback && userData.feedback.length > 0) {
-  //           userData.feedback.forEach((feedbackEntry, index) => {
-  //             const formattedDate = feedbackEntry.timestamp
-  //               ? new Date(feedbackEntry.timestamp).toLocaleString("en-US", {
-  //                 year: "numeric",
-  //                 month: "short",
-  //                 day: "2-digit",
-  //                 hour: "2-digit",
-  //                 minute: "2-digit",
-  //               })
-  //               : "N/A";
-
-  //             allFeedback.push({
-  //               id: `${userDoc.id}-${index}`,
-  //               eventId,
-  //               userDocId: userDoc.id,
-  //               eventName,
-  //               userName,
-  //               suggestion: feedbackEntry.custom || feedbackEntry.predefined || "N/A",
-  //               date: formattedDate,
-  //               status: feedbackEntry.status || "Yet to be Discussed",
-  //             });
-  //           });
-  //         }
-  //       }
-  //     }
-
-  //     console.log("all Feedback", allFeedback);
-
-
-  //     setFeedbackList(allFeedback);
-  //   } catch (error) {
-  //     console.error("Error fetching feedback:", error);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
+ 
 
   useEffect(() => {
 
@@ -203,13 +143,6 @@ const fetchFeedback = async () => {
     fetchFeedback()
     checkRegistrationStatus();
   }, [id]); // Runs when event ID changes
-
-  // Store phone number when entered
-  // const handlePhoneNumberSubmit = (number) => {
-  //   localStorage.setItem('ntnumber', number); // Store as 'ntnumber'
-  //   setPhoneNumber(number);
-  // };
-
 
 
   const handleAccept = async () => {
@@ -287,7 +220,7 @@ const fetchFeedback = async () => {
 
   const fetchUserName = async (phoneNumber) => {
     console.log("Fetch User from NTMembers", phoneNumber);
-    const userRef = doc(db, 'NTMember', phoneNumber);
+    const userRef = doc(db, 'NTMembers', phoneNumber);
     const userDoc = await getDoc(userRef);
 
     console.log("Check Details", userDoc.data());
@@ -562,7 +495,7 @@ const handleLogout = () => {
 
               <div className='meetingDetailsheading'>
                 <div className='statusbtn'>
-                { eventDetails?.momUrl ? <span className='meetingLable2'>Meeting Done</span> : <span className='meetingLable'>Current Meeting</span>}
+                { eventDetails?.momUrl ? <span className='meetingLable2'>Completed</span> : <span className='meetingLable'>Upcoming</span>}
                   
                   {currentMeetingstatus ? <span className='meetingLable3'>Declined</span> : null}
                 </div>
@@ -659,8 +592,8 @@ const handleLogout = () => {
                 }
                 {/* Button to Open Modal */}
                 {
-                  eventDetails?.momUrl ? <button className="suggetionBtn" onClick={() => setshowpopup(true)}>
-                   Add Suggestion
+                  eventDetails?.momUrl ? <button className="addsuggestion" onClick={() => setshowpopup(true)}>
+                   +Suggestion
                   </button> : null
                 }
 

@@ -59,7 +59,7 @@ const Navbar = (props) => {
                         <li>
                             <Link href="">
                                 <span className="icons"><BsCashCoin /></span>
-                                <span className="linklabel">Contribution Points</span>
+                                <span className="linklabel">CP</span>
                             </Link>
                 
                         <ul>
