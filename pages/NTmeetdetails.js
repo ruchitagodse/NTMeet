@@ -271,7 +271,7 @@ const handleLogout = () => {
             </div>
 
             <div className='headerRight'>
-              {/* <button onClick={() => router.push(`/cp-details/${phoneNumber}`)} class="reward-btn">
+              <button onClick={() => router.push(`/cp-details/${phoneNumber}`)} class="reward-btn">
                 <div class="IconContainer">
                   <svg
                     class="box-top box"
@@ -346,10 +346,8 @@ const handleLogout = () => {
                   <div class="coin"></div>
                 </div>
                 <div class="text">CP: {cpPoints}</div>  
-              </button> */}
-            <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
-  <span>{getInitials(userName)}</span>
-</div>
+              </button>
+              <div className='userName'> <span>{getInitials(userName)}</span> </div>
             </div>
 
 

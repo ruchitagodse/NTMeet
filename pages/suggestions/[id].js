@@ -25,7 +25,7 @@ export default function EventDetailsPage() {
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
   const [description, setDescription] = useState('');
   const { tab } = router.query;
-  
+   const [phoneNumber, setPhoneNumber] = useState('');
   const [userName, setUserName] = useState('');
   const [eventInfo, setEventInfo] = useState(null);
   const [users, setUsers] = useState([]);
@@ -39,6 +39,7 @@ export default function EventDetailsPage() {
   const [commentTexts, setCommentTexts] = useState({});
   const [ntMembers, setNtMembers] = useState([]);
   const [subTaskTexts, setSubTaskTexts] = useState({});
+    const [cpPoints, setCPPoints] = useState(0);
 
   const [selectedSuggestion, setSelectedSuggestion] = useState(null);
   const filteredSubtasks = subtasks.filter(
@@ -107,7 +108,15 @@ export default function EventDetailsPage() {
   }
 };
 
-
+useEffect(() => {
+  const storedPhoneNumber = localStorage.getItem('ntnumber');
+  if (storedPhoneNumber) {
+    fetchUserName(storedPhoneNumber);
+    setPhoneNumber(storedPhoneNumber);
+  } else {
+    console.error("Phone number not found in localStorage.");
+  }
+}, []);
   useEffect(() => {
     if (!id) return; // 'id' is the suggestion/task ID
 
@@ -975,11 +984,88 @@ className='actionBtn blueclr'
               <img src="/ujustlogo.png" alt="Logo" className="logo" />
             </div>
             <div>
-                <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
-  <span>{getInitials(userName)}</span>
-</div>
+                
+</div> <div className='headerRight'>
+              <button onClick={() => router.push(`/cp-details/${phoneNumber}`)} class="reward-btn">
+                <div class="IconContainer">
+                  <svg
+                    class="box-top box"
+                    viewBox="0 0 60 20"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M2 18L58 18"
+                      stroke="#6A8EF6"
+                      stroke-width="4"
+                      stroke-linecap="round"
+                    ></path>
+                    <circle
+                      cx="20.5"
+                      cy="9.5"
+                      r="7"
+                      fill="#101218"
+                      stroke="#6A8EF6"
+                      stroke-width="5"
+                    ></circle>
+                    <circle
+                      cx="38.5"
+                      cy="9.5"
+                      r="7"
+                      fill="#101218"
+                      stroke="#6A8EF6"
+                      stroke-width="5"
+                    ></circle>
+                  </svg>
 
+                  <svg
+                    class="box-body box"
+                    viewBox="0 0 58 44"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <mask id="path-1-inside-1_81_19" fill="white">
+                      <rect width="58" height="44" rx="3"></rect>
+                    </mask>
+                    <rect
+                      width="58"
+                      height="44"
+                      rx="3"
+                      fill="#101218"
+                      stroke="#6A8EF6"
+                      stroke-width="8"
+                      mask="url(#path-1-inside-1_81_19)"
+                    ></rect>
+                    <line
+                      x1="-3.61529e-09"
+                      y1="29"
+                      x2="58"
+                      y2="29"
+                      stroke="#6A8EF6"
+                      stroke-width="6"
+                    ></line>
+                    <path
+                      d="M45.0005 20L36 3"
+                      stroke="#6A8EF6"
+                      stroke-width="5"
+                      stroke-linecap="round"
+                    ></path>
+                    <path
+                      d="M21 3L13.0002 19.9992"
+                      stroke="#6A8EF6"
+                      stroke-width="5"
+                      stroke-linecap="round"
+                    ></path>
+                  </svg>
+
+                  <div class="coin"></div>
+                </div>
+                <div class="text">CP: {cpPoints}</div>  
+              </button>
+              <div className='userName'> <span>{getInitials(userName)}</span> </div>
             </div>
+
+           
           </section>
         </header>
         <section className='suggestionMains'>
