@@ -114,25 +114,33 @@ function HeaderNav() {
       
       
     return (
-        <div className="sticky-buttons-container">
-            <div className="icon-wrapper" title="Home" >
-                <FiHome size={26} onClick={() => router.push("/")} />
-                {/* <span className="red-dot" /> */}
-            </div>
-         <div className="icon-wrapper" title="NT Meetings">
-  <GrBraille size={26} onClick={() => router.push("/NTmeetdetails")} />
-</div> 
-<div className="icon-wrapper" title="Monthly Meetings">
-  <MdOutlineBusinessCenter size={26} onClick={() => router.push("/Monthlymeetdetails")} />
+      <div className="sticky-buttons-container">
+  <div className="icon-wrapper" onClick={() => router.push("/")}>
+    <FiHome size={26} />
+    <span className="icon-label">Home</span>
+  </div>
+  
+  <div className="icon-wrapper" onClick={() => router.push("/NTmeetdetails")}>
+    <GrBraille size={26} />
+    <span className="icon-label">NT</span>
+  </div>
+  
+  <div className="icon-wrapper" onClick={() => router.push("/Monthlymeetdetails")}>
+    <MdOutlineBusinessCenter size={26} />
+    <span className="icon-label">MM</span>
+  </div>
+  
+  <div className="icon-wrapper" onClick={() => router.push("/SuggestionList")}>
+    <TbBulb size={26} />
+    <span className="icon-label">Suggestions</span>
+  </div>
+  
+  <div className="icon-wrapper" onClick={() => router.push(`/cp-details/${phoneNumber}`)}>
+    <BiSolidCoinStack size={26} />
+    <span className="icon-label">CP</span>
+  </div>
 </div>
-<div className="icon-wrapper" title="Suggestions">
-  <TbBulb size={26} onClick={() => router.push("/SuggestionList")} />
-</div> 
- <div className="icon-wrapper" title="CP Details">
-  <BiSolidCoinStack size={26} onClick={() => router.push(`/cp-details/${phoneNumber}`)} />
-</div> 
 
-        </div>
     );
 }
 

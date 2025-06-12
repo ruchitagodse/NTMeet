@@ -593,7 +593,7 @@ const handleLogout = () => {
                 {/* Button to Open Modal */}
                 {
                   eventDetails?.momUrl ? <button className="addsuggestion" onClick={() => setshowpopup(true)}>
-                   +Suggestion
+                   Add Suggestion
                   </button> : null
                 }
 

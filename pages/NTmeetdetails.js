@@ -369,7 +369,7 @@ const handleLogout = () => {
 <div className='sectionHeadings'>
   <h2>Nucleus Team Meetings</h2>
   <button onClick={() => setshowpopup(true)} className="addsuggestion">
-    + Suggestion
+    Add Suggestion
   </button>
 {showpopup && (
   <div className="modal-overlay">
