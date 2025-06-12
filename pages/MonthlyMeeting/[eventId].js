@@ -21,12 +21,11 @@ export default function EventDetailsPage() {
   const router = useRouter();
   const { eventId } = router.query;
   const [userName, setUserName] = useState('');
-   const [phoneNumber, setPhoneNumber] = useState('');
   const [eventInfo, setEventInfo] = useState(null);
   const [users, setUsers] = useState([]);
   const [activeTab, setActiveTab] = useState('agenda');
   const [timeLeft, setTimeLeft] = useState(null);
-    const [cpPoints, setCPPoints] = useState(0);
+
   useEffect(() => {
     if (!eventInfo?.time?.seconds) return;
 
@@ -94,15 +93,7 @@ export default function EventDetailsPage() {
 
     fetchEventData();
   }, [eventId]);
-useEffect(() => {
-  const storedPhoneNumber = localStorage.getItem('ntnumber');
-  if (storedPhoneNumber) {
-    fetchUserName(storedPhoneNumber);
-    setPhoneNumber(storedPhoneNumber);
-  } else {
-    console.error("Phone number not found in localStorage.");
-  }
-}, []);
+
   const getInitials = (name) => {
     return name
       .split(" ")
@@ -420,8 +411,8 @@ const handleLogout = () => {
               <img src="/ujustlogo.png" alt="Logo" className="logo" />
             </div>
 
-           <div className='headerRight'>
-              <button onClick={() => router.push(`/cp-details/${phoneNumber}`)} class="reward-btn">
+            <div className='headerRight'>
+              {/* <button onClick={() => router.push(`/cp-details/${phoneNumber}`)} class="reward-btn">
                 <div class="IconContainer">
                   <svg
                     class="box-top box"
@@ -496,9 +487,12 @@ const handleLogout = () => {
                   <div class="coin"></div>
                 </div>
                 <div class="text">CP: {cpPoints}</div>  
-              </button>
-              <div className='userName'> <span>{getInitials(userName)}</span> </div>
+              </button> */}
+            <div className="userName" onClick={handleLogout} style={{ cursor: 'pointer' }}>
+  <span>{getInitials(userName)}</span>
+</div>
             </div>
+
 
 
 
@@ -577,7 +571,7 @@ const handleLogout = () => {
                     </div>
 
 
-                    <div className="see-all" onClick={() => setActiveTab("Registration")}>
+                    <div className="see-all" onClick={() => setActiveTab("Registrations")}>
                       See all
                     </div>
                   </div>

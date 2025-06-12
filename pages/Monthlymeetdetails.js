@@ -131,7 +131,7 @@ const sortedEvents = [...events].sort((a, b) => {
             <img src="/ujustlogo.png" alt="Logo" className="logo" />
           </div>
            <div className='headerRight'>
-              <button onClick={() => router.push(`/cp-details/${phoneNumber}`)} class="reward-btn">
+              {/* <button onClick={() => router.push(`/cp-details/${phoneNumber}`)} class="reward-btn">
                 <div class="IconContainer">
                   <svg
                     class="box-top box"
@@ -206,7 +206,7 @@ const sortedEvents = [...events].sort((a, b) => {
                   <div class="coin"></div>
                 </div>
                 <div class="text">CP: {cpPoints}</div>  
-              </button>
+              </button> */}
               <div className='userName'> <span>{getInitials(userName)}</span> </div>
             </div>
 
