@@ -1,7 +1,7 @@
 {
-	"name": "Rice Bowl",
-	"short_name": "Rice Bowl",
-	"description": "Fluffless jasmine rice for those cold winter nights",
+	"name": "NT App",
+	"short_name": "NT App",
+	"description": "Nucleus Team App ",
 	"icons": [
 		{
 			"src": "/images/icon-192.png",
